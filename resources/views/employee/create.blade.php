@@ -35,8 +35,27 @@
             <option value="nonaktif" {{ old('status') == 'nonaktif' ? 'selected' : '' }}>Non Aktif</option>
         </select><br><br>
 
+        <label for="departemen_id">Departemen:</label><br>
+        <select id="departemen_id" name="departemen_id">
+            <option value="1" {{ old('departemen_id') == 1 ? 'selected' : '' }}>DTIK</option>
+            <option value="2" {{ old('departemen_id') == 2 ? 'selected' : '' }}>DTME</option>
+        </select><br><br>
+
+        <label for="jabatan_id">Position:</label><br>
+        <select id="jabatan_id" name="jabatan_id">
+            <option value="1" {{ old('jabatan_id') == 1 ? 'selected' : '' }}>Dosen</option>
+            <option value="2" {{ old('jabatan_id') == 2 ? 'selected' : '' }}>Mahasiswa</option>
+        </select><br><br>
+
         <button type="submit">Simpan</button>
     </form>
+    <div style="color: red;">
+        <ul>
+            @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
 </body>
 
 </html>
