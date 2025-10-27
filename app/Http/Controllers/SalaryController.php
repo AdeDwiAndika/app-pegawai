@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Salary;
+use App\Models\Employee;
 use Illuminate\Http\Request;
 
 class SalaryController extends Controller
@@ -12,7 +13,7 @@ class SalaryController extends Controller
      */
     public function index()
     {
-        $salaries = Salary::latest()->paginate(5);
+        $salaries = Salary::with('employee')->paginate(5);
         return view('salary.index', compact('salaries'));
     }
 
@@ -21,7 +22,8 @@ class SalaryController extends Controller
      */
     public function create()
     {
-        //
+        $employees = Employee::all();
+        return view('salary.create', compact('employees'));
     }
 
     /**
@@ -29,7 +31,27 @@ class SalaryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'karyawan_id' => 'required|exists:employees,id',
+            'bulan' => 'required|string|max:10',
+            'gaji_pokok' => 'required|numeric|min:0',
+            'tunjangan' => 'nullable|numeric|min:0',
+            'potongan' => 'nullable|numeric|min:0',
+        ]);
+
+        // Hitung total gaji
+        $total_gaji = $request->gaji_pokok + $request->tunjangan - $request->potongan;
+
+        Salary::create([
+            'karyawan_id' => $request->karyawan_id,
+            'bulan' => $request->bulan,
+            'gaji_pokok' => $request->gaji_pokok,
+            'tunjangan' => $request->tunjangan ?? 0,
+            'potongan' => $request->potongan ?? 0,
+            'total_gaji' => $total_gaji,
+        ]);
+
+        return redirect()->route('salaries.index')->with('success', 'Data gaji berhasil ditambahkan!');
     }
 
     /**
@@ -37,7 +59,8 @@ class SalaryController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $salary = Salary::findOrFail($id);
+        return view('salary.show', compact('salary'));
     }
 
     /**
@@ -45,7 +68,9 @@ class SalaryController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $salary = Salary::findOrFail($id);
+        $employee = Employee::all();
+        return view('salary.edit', compact('salary', 'employee'));
     }
 
     /**
@@ -53,7 +78,28 @@ class SalaryController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'karyawan_id' => 'required|exists:employees,id',
+            'bulan' => 'required|string|max:10',
+            'gaji_pokok' => 'required|numeric|min:0',
+            'tunjangan' => 'nullable|numeric|min:0',
+            'potongan' => 'nullable|numeric|min:0',
+        ]);
+
+        $salary = Salary::findOrFail($id);
+
+        $total_gaji = $request->gaji_pokok + $request->tunjangan - $request->potongan;
+
+        $salary->update([
+            'karyawan_id' => $request->karyawan_id,
+            'bulan' => $request->bulan,
+            'gaji_pokok' => $request->gaji_pokok,
+            'tunjangan' => $request->tunjangan ?? 0,
+            'potongan' => $request->potongan ?? 0,
+            'total_gaji' => $total_gaji,
+        ]);
+
+        return redirect()->route('salaries.index')->with('success', 'Data gaji berhasil diperbarui!');
     }
 
     /**
@@ -61,6 +107,9 @@ class SalaryController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $salary = Salary::findOrFail($id);
+        $salary->delete();
+
+        return redirect()->route('salaries.index')->with('success', 'Data gaji berhasil dihapus!');
     }
 }

@@ -21,7 +21,7 @@ class PositionController extends Controller
      */
     public function create()
     {
-        //
+        return view('position.create');
     }
 
     /**
@@ -29,7 +29,13 @@ class PositionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nama_jabatan' => 'required|string|max:100',
+            'gaji_pokok' => 'required|numeric|min:0',
+        ]);
+
+        Position::create($request->all());
+        return redirect()->route('positions.index')->with('success', 'Data jabatan berhasil ditambahkan.');
     }
 
     /**
@@ -37,7 +43,8 @@ class PositionController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $position = Position::findOrFail($id);
+        return view('position.show', compact('position'));
     }
 
     /**
@@ -45,7 +52,8 @@ class PositionController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $position = Position::findOrFail($id);
+        return view('position.edit', compact('position'));
     }
 
     /**
@@ -53,7 +61,19 @@ class PositionController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'nama_jabatan' => 'required|string|max:100',
+            'gaji_pokok' => 'required|numeric|min:0',
+        ]);
+
+        $position = Position::findOrFail($id);
+
+        $position->update([
+            'nama_jabatan' => $request->nama_jabatan,
+            'gaji_pokok' => $request->gaji_pokok,
+        ]);
+
+        return redirect()->route('positions.index')->with('success', 'Data jabatan berhasil diperbarui.');
     }
 
     /**
@@ -61,6 +81,9 @@ class PositionController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $position = Position::findOrFail($id);
+        $salary->delete();
+
+        return redirect()->route('positions.index')->with('succes', 'Data posisi berhasil dihapus');
     }
 }

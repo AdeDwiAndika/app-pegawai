@@ -14,4 +14,9 @@ class Salary extends Model
         'potongan',
         'total_gaji',
     ];
+
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class, 'karyawan_id');
+    }
 }

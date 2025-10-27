@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Department extends Model
 {
     protected $fillable = [
-        'nama_departemen', // PERBAIKI INI (dari nama_department ke nama_departemen)
+        'nama_departemen',
     ];
 
     public function employees()

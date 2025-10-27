@@ -8,7 +8,7 @@ use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\PositionController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('employees.index');
 });
 
 Route::resource('employees', EmployeeController::class);

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Department;
 use Illuminate\Http\Request;
+use App\Models\Department;
 
 class DepartmentController extends Controller
 {
@@ -13,7 +13,8 @@ class DepartmentController extends Controller
     public function index()
     {
         $departments = Department::latest()->paginate(5);
-        return view('department.index', compact('departments'));
+        $title = 'Departments';
+        return view('department.index', compact('departments', 'title'));
     }
 
     /**
@@ -21,7 +22,8 @@ class DepartmentController extends Controller
      */
     public function create()
     {
-        //
+        $title = "Departments";
+        return view('department.create', compact('title'));
     }
 
     /**
@@ -29,7 +31,11 @@ class DepartmentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nama_departemen' => 'required|string|max:255',
+        ]);
+        Department::create($request->all());
+        return redirect()->route('departments.index');
     }
 
     /**
@@ -37,7 +43,8 @@ class DepartmentController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $department = Department::find($id);
+        return view('department.show', compact('department'));
     }
 
     /**
@@ -45,7 +52,9 @@ class DepartmentController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $department = Department::find($id);
+        $title = 'Departments';
+        return view('department.edit', compact('department', 'title'));
     }
 
     /**
@@ -53,7 +62,14 @@ class DepartmentController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'nama_departemen' => 'required|string|max:255',
+        ]);
+        $department = Department::findOrFail($id);
+        $department->update($request->only([
+            'nama_departemen'
+        ]));
+        return redirect()->route('departments.index');
     }
 
     /**
@@ -61,6 +77,8 @@ class DepartmentController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $deparment = Department::find($id);
+        $deparment->delete();
+        return redirect()->route('departments.index');
     }
 }
