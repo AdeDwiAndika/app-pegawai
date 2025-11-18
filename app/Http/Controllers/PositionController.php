@@ -13,7 +13,7 @@ class PositionController extends Controller
     public function index()
     {
         $positions = Position::latest()->paginate(5);
-        return view('position.index', compact('positions'));
+        return view('admin.position.index', compact('positions'));
     }
 
     /**
@@ -21,7 +21,7 @@ class PositionController extends Controller
      */
     public function create()
     {
-        return view('position.create');
+        return view('admin.position.create');
     }
 
     /**
@@ -44,7 +44,7 @@ class PositionController extends Controller
     public function show(string $id)
     {
         $position = Position::findOrFail($id);
-        return view('position.show', compact('position'));
+        return view('admin.position.show', compact('position'));
     }
 
     /**
@@ -53,7 +53,7 @@ class PositionController extends Controller
     public function edit(string $id)
     {
         $position = Position::findOrFail($id);
-        return view('position.edit', compact('position'));
+        return view('admin.position.edit', compact('position'));
     }
 
     /**
@@ -82,7 +82,7 @@ class PositionController extends Controller
     public function destroy(string $id)
     {
         $position = Position::findOrFail($id);
-        $salary->delete();
+        $position->delete();
 
         return redirect()->route('positions.index')->with('succes', 'Data posisi berhasil dihapus');
     }

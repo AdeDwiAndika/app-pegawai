@@ -1,18 +1,30 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\EmployeeController;
-use App\Http\Controllers\DepartmentController;
-use App\Http\Controllers\AttendanceController;
-use App\Http\Controllers\SalaryController;
-use App\Http\Controllers\PositionController;
+use App\Http\Controllers\DashboardController;
 
+// Redirect root → login
 Route::get('/', function () {
-    return redirect()->route('employees.index');
+    return redirect()->route('login');
 });
 
-Route::resource('employees', EmployeeController::class);
-Route::resource('departments', DepartmentController::class);
-Route::resource('salaries', SalaryController::class);
-Route::resource('attendances', AttendanceController::class);
-Route::resource('positions', PositionController::class);
+// Semua route yang butuh login
+Route::middleware(['auth', 'verified'])->group(function () {
+
+Route::get('/dashboard', function () {
+    if (auth()->user()->role === 'admin') {
+        return redirect()->route('admin.dashboard');
+    }
+
+    return redirect()->route('pegawai.dashboard');
+})->name('dashboard');
+
+    // Route khusus admin
+    require __DIR__.'/admin.php';
+
+    // Route khusus pegawai
+    require __DIR__.'/pegawai.php';
+});
+
+// Route auth dari Breeze
+require __DIR__.'/auth.php';

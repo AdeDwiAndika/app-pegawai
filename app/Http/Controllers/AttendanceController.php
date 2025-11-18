@@ -11,10 +11,20 @@ class AttendanceController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $attendances = Attendance::with('employee')->paginate(5);
-        return view('attendance.index', compact('attendances'));
+        $query = Attendance::with('employee');
+
+        // Fitur pencarian
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->whereHas('employee', function($q) use ($search) {
+                $q->where('nama_lengkap', 'LIKE', "%{$search}%");
+            });
+        }
+
+        $attendances = $query->paginate(5);
+        return view('admin.attendance.index', compact('attendances'));
     }
 
     /**
@@ -23,7 +33,7 @@ class AttendanceController extends Controller
     public function create()
     {
         $employees = Employee::all();
-        return view('attendance.create', compact('employees'));
+        return view('admin.attendance.create', compact('employees'));
     }
 
     /**
@@ -50,7 +60,7 @@ class AttendanceController extends Controller
     public function show(string $id)
     {
         $attendance = Attendance::with('employee')->findOrFail($id);
-        return view('attendance.show', compact('attendance'));
+        return view('admin.attendance.show', compact('attendance'));
     }
 
     /**
@@ -60,7 +70,7 @@ class AttendanceController extends Controller
     {
         $attendance = Attendance::findOrFail($id);
         $employees = Employee::all();
-        return view('attendance.edit', compact('attendance', 'employees'));
+        return view('admin.attendance.edit', compact('attendance', 'employees'));
     }
 
     /**

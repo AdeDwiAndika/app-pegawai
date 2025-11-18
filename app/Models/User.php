@@ -44,4 +44,30 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function employee()
+    {
+        return $this->hasOne(Employee::class, 'email', 'email');
+        // Atau jika pakai foreign key: return $this->hasOne(Employee::class, 'user_id');
+    }
+
+    public function attendances()
+    {
+        return $this->hasMany(\App\Models\Attendance::class, 'karyawan_id');
+    }
+
+    public function salaries()
+    {
+        return $this->hasMany(\App\Models\Salary::class, 'karyawan_id');
+    }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class, 'id_departemen');
+    }
+
+    // Relasi ke Position
+    public function position()
+    {
+        return $this->belongsTo(Position::class, 'id_jabatan');
+    }
 }

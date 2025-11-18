@@ -10,11 +10,22 @@ class DepartmentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $departments = Department::latest()->paginate(5);
-        $title = 'Departments';
-        return view('department.index', compact('departments', 'title'));
+        $query = Department::query();
+
+        // Fitur pencarian
+        if ($request->filled('search')) {
+            $query->where('nama_departemen', 'like', '%' . $request->search . '%');
+        }
+
+        // Pagination (10 per halaman)
+        $departments = $query->orderBy('nama_departemen', 'asc')->paginate(5);
+
+        // Kirim data ke view
+        return view('admin.department.index', [
+            'departments' => $departments,
+        ]);
     }
 
     /**
@@ -23,7 +34,7 @@ class DepartmentController extends Controller
     public function create()
     {
         $title = "Departments";
-        return view('department.create', compact('title'));
+        return view('admin.department.create', compact('title'));
     }
 
     /**
@@ -44,7 +55,7 @@ class DepartmentController extends Controller
     public function show(string $id)
     {
         $department = Department::find($id);
-        return view('department.show', compact('department'));
+        return view('admin.department.show', compact('department'));
     }
 
     /**
@@ -54,7 +65,7 @@ class DepartmentController extends Controller
     {
         $department = Department::find($id);
         $title = 'Departments';
-        return view('department.edit', compact('department', 'title'));
+        return view('admin.department.edit', compact('department', 'title'));
     }
 
     /**

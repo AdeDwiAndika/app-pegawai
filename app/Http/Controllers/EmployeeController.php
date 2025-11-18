@@ -9,17 +9,28 @@ use Illuminate\Http\Request;
 
 class EmployeeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $employees = Employee::latest()->paginate(5);
-        return view('employee.index', compact('employees'));
+        $search = $request->input('search');
+
+        $employees = Employee::query()
+            ->when($search, function ($query, $search) {
+                return $query->where('nama_lengkap', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%")
+                            ->orWhere('nomor_telepon', 'like', "%{$search}%")
+                            ->orWhere('alamat', 'like', "%{$search}%");
+            })
+            ->paginate(5)
+            ->withQueryString(); // Mempertahankan parameter search saat pagination
+
+        return view('admin.employee.index', compact('employees', 'search'));
     }
 
     public function create()
     {
         $departments = Department::all();
         $positions = Position::all();
-        return view('employee.create', compact('departments', 'positions'));
+        return view('admin.employee.create', compact('departments', 'positions'));
     }
 
     public function store(Request $request)
@@ -44,8 +55,9 @@ class EmployeeController extends Controller
     public function show(string $id)
     {
         $employee = Employee::find($id);
-        $title = "Employees";
-        return view('employee.show', compact('employee', 'title'));
+        $departments = Department::all();
+        $positions = Position::all();
+        return view('admin.employee.show', compact('employee', 'departments', 'positions'));
     }
 
     public function edit(string $id)
@@ -53,7 +65,7 @@ class EmployeeController extends Controller
         $employee = Employee::findOrFail($id);
         $departments = Department::all();
         $positions = Position::all();
-        return view('employee.edit', compact('employee', 'departments', 'positions'));
+        return view('admin.employee.edit', compact('employee', 'departments', 'positions'));
     }
 
     public function update(Request $request, string $id)
